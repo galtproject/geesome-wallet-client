@@ -16,7 +16,7 @@ module.exports = {
     return ethers.Wallet.createRandom()._mnemonic().phrase;
   },
 
-  getKeypairByMnemonic(mnemonic, derivationPath = "m/44'/60'/0'/0/", index = 0) {
+  getKeypairByMnemonic(mnemonic, index = 0, derivationPath = "m/44'/60'/0'/0/") {
     const wallet = ethers.Wallet.fromMnemonic(mnemonic, `${derivationPath}${index}`);
     return {
       address: wallet.address,
