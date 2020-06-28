@@ -10,8 +10,20 @@
 const ethers = require('ethers');
 const pbkdf2 = require('pbkdf2');
 const aesjs = require('aes-js');
+const { Transaction } = require('ethereumjs-tx');
+const ethUtil = require('ethereumjs-util');
+const sigUtil = require('eth-sig-util');
 
-module.exports = {
+const lib = {
+  getDefaultCryptoMetadata() {
+    return {
+      derivationPath: `m/44'/60'/0'/0/`,
+      iterations: 100000,
+      kdf: 'sha512',
+      cryptoCounter: 5,
+      version: 1
+    }
+  },
   generateMnemonic() {
     return ethers.Wallet.createRandom()._mnemonic().phrase;
   },
@@ -52,5 +64,34 @@ module.exports = {
 
     // Convert our bytes back into text
     return aesjs.utils.utf8.fromBytes(decryptedBytes);
+  },
+
+  signAndGetRawTx(privateKey, txParams) {
+    const tx = new Transaction(txParams);
+    tx.sign(privateKey);
+    return '0x' + tx.serialize().toString('hex')
+  },
+
+  signMessage(privateKey, msgParams) {
+    const dataBuff = ethUtil.toBuffer(msgParams.data);
+    const msgHash = ethUtil.hashPersonalMessage(dataBuff);
+    const sig = ethUtil.ecsign(msgHash, privateKey);
+    return lib.concatSig(sig.v, sig.r, sig.s);//ethUtil.bufferToHex()
+  },
+
+  signTypedData(privateKey, msgParams) {
+    return sigUtil.signTypedData(privateKey, msgParams);
+  },
+
+  concatSig(v, r, s) {
+    r = ethUtil.fromSigned(r);
+    s = ethUtil.fromSigned(s);
+    v = ethUtil.bufferToInt(v);
+    r = ethUtil.toUnsigned(r).toString('hex').padStart(64, 0);
+    s = ethUtil.toUnsigned(s).toString('hex').padStart(64, 0);
+    v = ethUtil.stripHexPrefix(ethUtil.intToHex(v));
+    return ethUtil.addHexPrefix(r.concat(s, v).toString("hex"));
   }
 };
+
+module.exports = lib;
