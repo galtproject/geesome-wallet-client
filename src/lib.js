@@ -11,7 +11,6 @@ const ethers = require('ethers');
 const pbkdf2 = require('pbkdf2');
 const aesjs = require('aes-js');
 const { Transaction } = require('ethereumjs-tx');
-const ethUtil = require('ethereumjs-util');
 const sigUtil = require('eth-sig-util');
 
 const lib = {
@@ -81,22 +80,12 @@ const lib = {
 
   signMessage(privateKey, msgParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
-    return sigUtil.signTypedMessage(privateKeyBytes, {data: msgParams}, 'V4');
+    return sigUtil.signTypedMessage(privateKeyBytes, {data: msgParams}, 'V1');
   },
 
   signTypedData(privateKey, msgParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
     return sigUtil.signTypedData(privateKeyBytes, {data: msgParams});
-  },
-
-  concatSig(v, r, s) {
-    r = ethUtil.fromSigned(r);
-    s = ethUtil.fromSigned(s);
-    v = ethUtil.bufferToInt(v);
-    r = ethUtil.toUnsigned(r).toString('hex').padStart(64, 0);
-    s = ethUtil.toUnsigned(s).toString('hex').padStart(64, 0);
-    v = ethUtil.stripHexPrefix(ethUtil.intToHex(v));
-    return ethUtil.addHexPrefix(r.concat(s, v).toString("hex"));
   }
 };
 
