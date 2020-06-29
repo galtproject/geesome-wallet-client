@@ -59,7 +59,7 @@ module.exports = (options) => {
       await client.waitForReady().catch(cb);
       this.emitPayload({ method: 'net_version', params: [] }, function(err, res){
         if (err) return cb(err);
-        txParams.chainId = res.result;
+        txParams.chainId = parseInt(res.result);
         cb(null, client.signTransaction(txParams));
       });
     },
