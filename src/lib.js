@@ -72,7 +72,9 @@ const lib = {
 
   signAndGetRawTx(privateKey, txParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
-    const tx = new Transaction(txParams);
+    const tx = new Transaction(txParams, {
+      chain: txParams.chainId
+    });
     tx.sign(privateKeyBytes);
     return '0x' + tx.serialize().toString('hex')
   },
