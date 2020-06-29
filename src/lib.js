@@ -67,20 +67,23 @@ const lib = {
   },
 
   signAndGetRawTx(privateKey, txParams) {
+    const privateKeyBytes = Buffer.from(aesjs.utils.hex.toBytes(privateKey));
     const tx = new Transaction(txParams);
-    tx.sign(privateKey);
+    tx.sign(privateKeyBytes);
     return '0x' + tx.serialize().toString('hex')
   },
 
   signMessage(privateKey, msgParams) {
+    const privateKeyBytes = Buffer.from(aesjs.utils.hex.toBytes(privateKey));
     const dataBuff = ethUtil.toBuffer(msgParams.data);
     const msgHash = ethUtil.hashPersonalMessage(dataBuff);
-    const sig = ethUtil.ecsign(msgHash, privateKey);
+    const sig = ethUtil.ecsign(msgHash, privateKeyBytes);
     return lib.concatSig(sig.v, sig.r, sig.s);//ethUtil.bufferToHex()
   },
 
   signTypedData(privateKey, msgParams) {
-    return sigUtil.signTypedData(privateKey, msgParams);
+    const privateKeyBytes = Buffer.from(aesjs.utils.hex.toBytes(privateKey));
+    return sigUtil.signTypedData(privateKeyBytes, msgParams);
   },
 
   concatSig(v, r, s) {
