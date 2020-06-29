@@ -81,12 +81,12 @@ const lib = {
 
   signMessage(privateKey, msgParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
-    return sigUtil.signTypedMessage(privateKeyBytes, msgParams, 'V4');
+    return sigUtil.signTypedMessage(privateKeyBytes, {data: msgParams}, 'V4');
   },
 
   signTypedData(privateKey, msgParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
-    return sigUtil.signTypedData(privateKeyBytes, msgParams);
+    return sigUtil.signTypedData(privateKeyBytes, {data: msgParams});
   },
 
   concatSig(v, r, s) {
