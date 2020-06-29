@@ -2497,10 +2497,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-web3-provider-engine@^15.0.12:
+"web3-provider-engine@git://github.com/galtproject/web3-provider-engine.git#d611db5":
   version "15.0.12"
-  resolved "https://registry.yarnpkg.com/web3-provider-engine/-/web3-provider-engine-15.0.12.tgz#24d7f2f6fb6de856824c7306291018c4fc543ac3"
-  integrity sha512-/OfhQalKPND1iB5ggvGuYF0+SIb2Qj5OFTrT2VrZWP79UhMTdP7T+L2FtblmRdCeOetoAzZHdBaIwLOZsmIX+w==
+  resolved "git://github.com/galtproject/web3-provider-engine.git#d611db5950cd3433470f08d5c4b80f42a6199f49"
   dependencies:
     async "^2.5.0"
     backoff "^2.5.0"
