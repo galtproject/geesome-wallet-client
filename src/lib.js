@@ -81,10 +81,7 @@ const lib = {
 
   signMessage(privateKey, msgParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
-    const dataBuff = ethUtil.toBuffer(msgParams.data);
-    const msgHash = ethUtil.hashPersonalMessage(dataBuff);
-    const sig = ethUtil.ecsign(msgHash, privateKeyBytes);
-    return lib.concatSig(sig.v, sig.r, sig.s);//ethUtil.bufferToHex()
+    return sigUtil.signTypedMessage(privateKeyBytes, msgParams, 'V4');
   },
 
   signTypedData(privateKey, msgParams) {
