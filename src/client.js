@@ -57,8 +57,9 @@ module.exports = (options) => {
       })
     },
 
-    async register(email, password) {
+    async register(email, password, additionalData = {}) {
       cryptoMetadata = lib.getDefaultCryptoMetadata();
+      const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
 
       seed = lib.generateMnemonic();
       const passwordDerivedKey = lib.getPasswordDerivedKey(password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
@@ -71,7 +72,9 @@ module.exports = (options) => {
         email,
         passwordHash,
         encryptedSeed,
-        cryptoMetadataJson: JSON.stringify(cryptoMetadata)
+        primaryAddress: primaryWallet.address,
+        cryptoMetadataJson: JSON.stringify(cryptoMetadata),
+        ...additionalData
       }).then(wrapResponse);
     },
 
@@ -84,6 +87,23 @@ module.exports = (options) => {
 
       seed = lib.decrypt(passwordDerivedKey, wallet.encryptedSeed, cryptoMetadata.cryptoCounter);
       return wallet;
+    },
+
+    async updateWallet(walletData) {
+      const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
+      const messageParams = [
+        { type: 'string', name: 'action', value: 'updateWallet'},
+        { type: 'string', name: 'walletData', value: JSON.stringify(walletData)},
+        { type: 'string', name: 'expiredOn', value: expiredOn}
+      ];
+
+      const signature = this.signMessage(messageParams);
+      return http.post('v1/update-wallet', {
+        walletData,
+        signature,
+        expiredOn,
+        primaryAddress: getActiveAccount().address
+      }).then(wrapResponse);
     },
 
     async getCryptoMetadataByEmail(email) {
