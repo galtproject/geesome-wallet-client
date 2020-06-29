@@ -57,7 +57,11 @@ module.exports = (options) => {
     },
     signTransaction: async function (txParams, cb) {
       await client.waitForReady().catch(cb);
-      cb(null, client.signTransaction(txParams));
+      this.emitPayload({ method: 'net_version', params: [] }, function(err, res){
+        if (err) return cb(err);
+        txParams.chainId = res.result;
+        cb(null, client.signTransaction(txParams));
+      });
     },
     signMessage: async function (msgParams, cb) {
       await client.waitForReady().catch(cb);
