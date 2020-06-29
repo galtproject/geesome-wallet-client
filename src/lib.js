@@ -66,15 +66,19 @@ const lib = {
     return aesjs.utils.utf8.fromBytes(decryptedBytes);
   },
 
+  hexToBuffer(hex) {
+    return Buffer.from(aesjs.utils.hex.toBytes(hex.indexOf('0x') === 0 ? hex.slice(2) : hex));
+  },
+
   signAndGetRawTx(privateKey, txParams) {
-    const privateKeyBytes = Buffer.from(aesjs.utils.hex.toBytes(privateKey));
+    const privateKeyBytes = lib.hexToBuffer(privateKey);
     const tx = new Transaction(txParams);
     tx.sign(privateKeyBytes);
     return '0x' + tx.serialize().toString('hex')
   },
 
   signMessage(privateKey, msgParams) {
-    const privateKeyBytes = Buffer.from(aesjs.utils.hex.toBytes(privateKey));
+    const privateKeyBytes = lib.hexToBuffer(privateKey);
     const dataBuff = ethUtil.toBuffer(msgParams.data);
     const msgHash = ethUtil.hashPersonalMessage(dataBuff);
     const sig = ethUtil.ecsign(msgHash, privateKeyBytes);
@@ -82,7 +86,7 @@ const lib = {
   },
 
   signTypedData(privateKey, msgParams) {
-    const privateKeyBytes = Buffer.from(aesjs.utils.hex.toBytes(privateKey));
+    const privateKeyBytes = lib.hexToBuffer(privateKey);
     return sigUtil.signTypedData(privateKeyBytes, msgParams);
   },
 
