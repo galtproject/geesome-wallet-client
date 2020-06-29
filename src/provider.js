@@ -11,7 +11,7 @@ const ProviderEngine = require('web3-provider-engine');
 const CacheSubprovider = require('web3-provider-engine/subproviders/cache.js');
 const FixtureSubprovider = require('web3-provider-engine/subproviders/fixture.js');
 const FilterSubprovider = require('web3-provider-engine/subproviders/filters.js');
-const VmSubprovider = require('web3-provider-engine/subproviders/vm.js');
+// const VmSubprovider = require('web3-provider-engine/subproviders/vm.js');
 const HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js');
 const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker.js');
 const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js');
@@ -42,13 +42,13 @@ module.exports = (options) => {
   // pending nonce
   engine.addProvider(new NonceSubprovider());
   // vm
-  engine.addProvider(new VmSubprovider());
+  // engine.addProvider({ setEngine() {} });
 
   // id mgmt
   engine.addProvider(new HookedWalletSubprovider({
     getAccounts: async function (cb) {
       await client.waitForReady().catch(cb);
-      cb(null, [client.getAccountsAddresses()]);
+      cb(null, client.getAccountsAddresses());
     },
     approveTransaction: async function (txParams, cb) {
       await client.waitForReady().catch(cb);
