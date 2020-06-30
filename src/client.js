@@ -16,7 +16,7 @@ module.exports = (options) => {
   // ad slash to the end if not present
   backendUrl = backendUrl.replace(/\/?$/, '/');
 
-  const http = axios.create({ baseURL: backendUrl });
+  const http = axios.create({ baseURL: backendUrl, withCredentials: true });
 
   const wrapResponse = (response) => {
     return response.data;
