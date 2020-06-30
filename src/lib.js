@@ -45,7 +45,7 @@ const lib = {
 
   encrypt(key, text, counter = 5) {
     const textBytes = aesjs.utils.utf8.toBytes(text);
-    const keyBytes = aesjs.utils.hex.toBytes(key);
+    const keyBytes = lib.hexToBytes(key);
 
     // The counter is optional, and if omitted will begin at 1
     const aesCtr = new aesjs.ModeOfOperation.ctr(keyBytes, new aesjs.Counter(counter));
@@ -54,8 +54,8 @@ const lib = {
   },
 
   decrypt(key, encryptedHex, counter = 5) {
-    const encryptedBytes = aesjs.utils.hex.toBytes(encryptedHex);
-    const keyBytes = aesjs.utils.hex.toBytes(key);
+    const encryptedBytes = lib.hexToBytes(encryptedHex);
+    const keyBytes = lib.hexToBytes(key);
     // The counter mode of operation maintains internal state, so to
     // decrypt a new instance must be instantiated.
     const aesCtr = new aesjs.ModeOfOperation.ctr(keyBytes, new aesjs.Counter(counter));
@@ -66,7 +66,11 @@ const lib = {
   },
 
   hexToBuffer(hex) {
-    return Buffer.from(aesjs.utils.hex.toBytes(hex.indexOf('0x') === 0 ? hex.slice(2) : hex));
+    return Buffer.from(lib.hexToBytes(hex));
+  },
+
+  hexToBytes(hex) {
+    return aesjs.utils.hex.toBytes(hex.indexOf('0x') === 0 ? hex.slice(2) : hex);
   },
 
   signAndGetRawTx(privateKey, txParams) {
