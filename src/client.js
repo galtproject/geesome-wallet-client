@@ -112,6 +112,10 @@ module.exports = (options) => {
       }).then(wrapResponse);
     },
 
+    async getSession() {
+      return http.post('v1/get-session').then(wrapResponse);
+    },
+
     async getCryptoMetadataByEmail(email) {
       return http.post('v1/get-crypto-metadata-by-email', { email }).then(wrapResponse);
     },
