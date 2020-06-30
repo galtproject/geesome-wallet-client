@@ -43,7 +43,7 @@ module.exports = (options) => {
 
   return {
     isReady() {
-      return !!seed;
+      return !!seed && !!cryptoMetadata;
     },
 
     async waitForReady(times = 0) {
@@ -149,8 +149,9 @@ module.exports = (options) => {
       if(!encryptedSeed) {
         throw new Error('encryptedSeed_is_null');
       }
-      seed = lib.decrypt(secret, encryptedSeed);
       email = localStorage.getItem('GeesomeWallet:email');
+      seed = lib.decrypt(secret, encryptedSeed);
+
       await this.fetchCryptoMetadataByEmail(email);
       return true;
     },
