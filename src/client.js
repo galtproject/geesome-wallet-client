@@ -25,9 +25,15 @@ module.exports = (options) => {
   let seed;
   let cryptoMetadata;
   let activeAccountIndex = 0;
+  let accountsByIndexes = {
+
+  };
 
   const getAccountByIndex = (index) => {
-    return lib.getKeypairByMnemonic(seed, index, cryptoMetadata.derivationPath);
+    if(!accountsByIndexes[index]) {
+      accountsByIndexes[index] = lib.getKeypairByMnemonic(seed, index, cryptoMetadata.derivationPath);
+    }
+    return accountsByIndexes[index];
   };
 
   const getActiveAccount = () => {
