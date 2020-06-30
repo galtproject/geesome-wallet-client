@@ -22,9 +22,15 @@ module.exports = (options) => {
 
   const client = require('./client')({ backendUrl });
 
-  client.login(email, password).catch((err) => {
-    console.log('login error', err);
-  });
+  if(email && password) {
+    client.login(email, password).catch((err) => {
+      console.log('login error', err);
+    });
+  } else {
+    client.getEncryptedSeedFromLocalStorage().catch((err) => {
+      console.log('getEncryptedSeedFromLocalStorage error', err);
+    })
+  }
 
   // static results
   engine.addProvider(new FixtureSubprovider({

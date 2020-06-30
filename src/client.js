@@ -74,7 +74,7 @@ module.exports = (options) => {
 
       const passwordHash = lib.getPasswordHash(passwordDerivedKey, password);
 
-      return http.post('v1/create-wallet', {
+      const wallet = await http.post('v1/create-wallet', {
         email,
         passwordHash,
         encryptedSeed,
@@ -82,6 +82,10 @@ module.exports = (options) => {
         cryptoMetadataJson: JSON.stringify(cryptoMetadata),
         ...additionalData
       }).then(wrapResponse);
+
+      this.setEncryptedSeedToLocalStorage();
+
+      return wallet;
     },
 
     async login(email, password) {
@@ -92,6 +96,9 @@ module.exports = (options) => {
       const wallet = await this.getWalletByEmailAndPasswordHash(email, passwordHash);
 
       seed = lib.decrypt(passwordDerivedKey, wallet.encryptedSeed, cryptoMetadata.cryptoCounter);
+
+      this.setEncryptedSeedToLocalStorage();
+
       return wallet;
     },
 
