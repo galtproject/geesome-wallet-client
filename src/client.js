@@ -59,9 +59,9 @@ module.exports = (options) => {
 
     async register(email, password, additionalData = {}) {
       cryptoMetadata = lib.getDefaultCryptoMetadata();
+      seed = lib.generateMnemonic();
       const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
 
-      seed = lib.generateMnemonic();
       const passwordDerivedKey = lib.getPasswordDerivedKey(password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
 
       const encryptedSeed = lib.encrypt(passwordDerivedKey, seed, cryptoMetadata.cryptoCounter);
