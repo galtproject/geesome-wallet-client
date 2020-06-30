@@ -112,6 +112,31 @@ module.exports = (options) => {
       }).then(wrapResponse);
     },
 
+    async setEncryptedSeedToLocalStorage() {
+      const { secret } = await this.getSession();
+      if(!secret) {
+        throw new Error('secret_is_null');
+      }
+      if(!seed) {
+        throw new Error('seed_is_null');
+      }
+      localStorage.setItem('encryptedSeed', lib.encrypt(secret, seed));
+      return true;
+    },
+
+    async getEncryptedSeedFromLocalStorage() {
+      const { secret } = await this.getSession();
+      if(!secret) {
+        throw new Error('secret_is_null');
+      }
+      const encryptedSeed = localStorage.getItem('encryptedSeed');
+      if(!encryptedSeed) {
+        throw new Error('encryptedSeed_is_null');
+      }
+      seed = lib.decrypt(secret, encryptedSeed);
+      return true;
+    },
+
     async getSession() {
       return http.post('v1/get-session').then(wrapResponse);
     },
