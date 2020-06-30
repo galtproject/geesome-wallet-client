@@ -86,9 +86,9 @@ module.exports = (options) => {
       }).then(wrapResponse);
 
       //TODO: figure out - why it got the old session right after create-wallet request
-      setTimeout(() => {
+      // setTimeout(() => {
         this.setEncryptedSeedToLocalStorage();
-      }, 5000);
+      // }, 5000);
 
       return wallet;
     },
@@ -103,9 +103,9 @@ module.exports = (options) => {
 
       seed = lib.decrypt(passwordDerivedKey, wallet.encryptedSeed, cryptoMetadata.cryptoCounter);
 
-      setTimeout(() => {
+      // setTimeout(() => {
         this.setEncryptedSeedToLocalStorage();
-      }, 5000);
+      // }, 5000);
 
       return wallet;
     },
