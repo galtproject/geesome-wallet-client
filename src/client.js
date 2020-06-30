@@ -47,7 +47,7 @@ module.exports = (options) => {
     },
 
     async waitForReady(times = 0) {
-      if(seed) {
+      if(this.isReady()) {
         return;
       }
       if(times > 10) {
@@ -55,7 +55,7 @@ module.exports = (options) => {
       }
       return new Promise((resolve) => {
         setTimeout(() => {
-          if(seed) {
+          if(this.isReady()) {
             resolve();
           } else {
             resolve(this.waitForReady(times++));
