@@ -22,6 +22,7 @@ module.exports = (options) => {
     return response.data;
   };
 
+  let email;
   let seed;
   let cryptoMetadata;
   let activeAccountIndex = 0;
@@ -63,24 +64,25 @@ module.exports = (options) => {
       })
     },
 
-    async register(email, password, additionalData = {}) {
+    async register(_email, _password, _additionalData = {}) {
+      email = _email;
       cryptoMetadata = lib.getDefaultCryptoMetadata();
       seed = lib.generateMnemonic();
       const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
 
-      const passwordDerivedKey = lib.getPasswordDerivedKey(password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
+      const passwordDerivedKey = lib.getPasswordDerivedKey(_password, _email, cryptoMetadata.iterations, cryptoMetadata.kdf);
 
       const encryptedSeed = lib.encrypt(passwordDerivedKey, seed, cryptoMetadata.cryptoCounter);
 
-      const passwordHash = lib.getPasswordHash(passwordDerivedKey, password);
+      const passwordHash = lib.getPasswordHash(passwordDerivedKey, _password);
 
       const wallet = await http.post('v1/create-wallet', {
-        email,
+        email: _email,
         passwordHash,
         encryptedSeed,
         primaryAddress: primaryWallet.address,
         cryptoMetadataJson: JSON.stringify(cryptoMetadata),
-        ...additionalData
+        ..._additionalData
       }).then(wrapResponse);
 
       this.setEncryptedSeedToLocalStorage();
@@ -88,12 +90,13 @@ module.exports = (options) => {
       return wallet;
     },
 
-    async login(email, password) {
-      cryptoMetadata = await this.getCryptoMetadataByEmail(email);
+    async login(_email, _password) {
+      email = _email;
+      await this.fetchCryptoMetadataByEmail(_email);
 
-      const passwordDerivedKey = lib.getPasswordDerivedKey(password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
-      const passwordHash = lib.getPasswordHash(passwordDerivedKey, password);
-      const wallet = await this.getWalletByEmailAndPasswordHash(email, passwordHash);
+      const passwordDerivedKey = lib.getPasswordDerivedKey(_password, _email, cryptoMetadata.iterations, cryptoMetadata.kdf);
+      const passwordHash = lib.getPasswordHash(passwordDerivedKey, _password);
+      const wallet = await this.getWalletByEmailAndPasswordHash(_email, passwordHash);
 
       seed = lib.decrypt(passwordDerivedKey, wallet.encryptedSeed, cryptoMetadata.cryptoCounter);
 
@@ -102,17 +105,17 @@ module.exports = (options) => {
       return wallet;
     },
 
-    async updateWallet(walletData) {
+    async updateWallet(_walletData) {
       const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
       const messageParams = [
         { type: 'string', name: 'action', value: 'updateWallet'},
-        { type: 'string', name: 'walletData', value: JSON.stringify(walletData)},
+        { type: 'string', name: 'walletData', value: JSON.stringify(_walletData)},
         { type: 'string', name: 'expiredOn', value: expiredOn}
       ];
 
       const signature = this.signMessage(messageParams);
       return http.post('v1/update-wallet', {
-        walletData,
+        walletData: _walletData,
         signature,
         expiredOn,
         primaryAddress: getActiveAccount().address
@@ -127,7 +130,8 @@ module.exports = (options) => {
       if(!seed) {
         throw new Error('seed_is_null');
       }
-      localStorage.setItem('encryptedSeed', lib.encrypt(secret, seed));
+      localStorage.setItem('GeesomeWallet:encryptedSeed', lib.encrypt(secret, seed));
+      localStorage.setItem('GeesomeWallet:email', email);
       return true;
     },
 
@@ -141,11 +145,17 @@ module.exports = (options) => {
         throw new Error('encryptedSeed_is_null');
       }
       seed = lib.decrypt(secret, encryptedSeed);
+      email = localStorage.getItem('GeesomeWallet:email');
+      await this.fetchCryptoMetadataByEmail(email);
       return true;
     },
 
     async getSession() {
       return http.post('v1/get-session').then(wrapResponse);
+    },
+
+    async fetchCryptoMetadataByEmail(email) {
+      cryptoMetadata = await this.getCryptoMetadataByEmail(email);
     },
 
     async getCryptoMetadataByEmail(email) {
