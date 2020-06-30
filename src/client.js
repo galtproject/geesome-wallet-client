@@ -145,7 +145,7 @@ module.exports = (options) => {
       if(!secret) {
         throw new Error('secret_is_null');
       }
-      const encryptedSeed = localStorage.getItem('encryptedSeed');
+      const encryptedSeed = localStorage.getItem('GeesomeWallet:encryptedSeed');
       if(!encryptedSeed) {
         throw new Error('encryptedSeed_is_null');
       }
