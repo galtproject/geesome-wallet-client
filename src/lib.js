@@ -12,6 +12,7 @@ const pbkdf2 = require('pbkdf2');
 const aesjs = require('aes-js');
 const { Transaction } = require('ethereumjs-tx');
 const sigUtil = require('eth-sig-util');
+const EthereumJsCommon = require('ethereumjs-common').default;
 
 const lib = {
   getDefaultCryptoMetadata() {
@@ -76,8 +77,18 @@ const lib = {
 
   signAndGetRawTx(privateKey, txParams) {
     const privateKeyBytes = lib.hexToBuffer(privateKey);
+    const customCommon = EthereumJsCommon.forCustomChain(
+      'mainnet',
+      {
+        name: 'chain-' + txParams.chainId,
+        networkId: txParams.chainId,
+        chainId: txParams.chainId,
+      },
+      'petersburg',
+    );
+
     const tx = new Transaction(txParams, {
-      chain: txParams.chainId
+      common: customCommon
     });
     tx.sign(privateKeyBytes);
     return '0x' + tx.serialize().toString('hex')
