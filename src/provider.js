@@ -17,13 +17,17 @@ const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracke
 const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js');
 
 module.exports = (options) => {
-  const {rpcUrl, backendUrl, password, email} = options;
+  const {rpcUrl, backendUrl, password, email, phone, wallet} = options;
   const engine = new ProviderEngine();
 
   const client = require('./client')({ backendUrl });
 
   if(email && password) {
-    client.login(email, password).catch((err) => {
+    client.login(email, password, 'email').catch((err) => {
+      console.log('login error', err);
+    });
+  } else if(phone && password) {
+    client.login(phone, password, 'phone').catch((err) => {
       console.log('login error', err);
     });
   } else {

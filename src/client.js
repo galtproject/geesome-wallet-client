@@ -120,6 +120,21 @@ module.exports = (options) => {
 
         seed = lib.decrypt(phonePasswordDerivedKey, wallet.phoneEncryptedSeed, cryptoMetadata.cryptoCounter);
 
+      } else if(_method === 'wallet') {
+        wallet = _login;
+
+        cryptoMetadata = JSON.parse(wallet.cryptoMetadataJson);
+
+        if(wallet.phone) {
+          phone = wallet.phone;
+          const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_password, phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
+          seed = lib.decrypt(phonePasswordDerivedKey, wallet.phoneEncryptedSeed, cryptoMetadata.cryptoCounter);
+        } else if(wallet.email) {
+          email = wallet.email;
+          const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
+          seed = lib.decrypt(emailPasswordDerivedKey, wallet.emailEncryptedSeed, cryptoMetadata.cryptoCounter);
+        }
+
       } else {
         throw Error('unknown_method');
       }
