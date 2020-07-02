@@ -161,18 +161,19 @@ module.exports = (options) => {
       }).then(wrapResponse);
     },
 
-    async setEncryptedSeedToLocalStorage() {
-      const { secret } = await this.getSession();
-      if(!secret) {
-        throw new Error('secret_is_null');
-      }
-      if(!seed) {
-        throw new Error('seed_is_null');
-      }
-      localStorage.setItem('GeesomeWallet:encryptedSeed', lib.encrypt(secret, seed));
+    setEncryptedSeedToLocalStorage() {
       localStorage.setItem('GeesomeWallet:email', email);
       localStorage.setItem('GeesomeWallet:phone', phone);
-      return true;
+      return this.getSession().then(({ secret }) => {
+        if(!secret) {
+          throw new Error('secret_is_null');
+        }
+        if(!seed) {
+          throw new Error('seed_is_null');
+        }
+        localStorage.setItem('GeesomeWallet:encryptedSeed', lib.encrypt(secret, seed));
+        return true;
+      });
     },
 
     async getEncryptedSeedFromLocalStorage() {
