@@ -161,6 +161,17 @@ module.exports = (options) => {
       }).then(wrapResponse);
     },
 
+    async exportSeed() {
+      if (seed) {
+        return seed;
+      }
+
+      if(localStorage.getItem('GeesomeWallet:encryptedSeed')) {
+        await this.getEncryptedSeedFromLocalStorage();
+      }
+      return seed;
+    },
+
     setEncryptedSeedToLocalStorage() {
       localStorage.setItem('GeesomeWallet:email', email);
       localStorage.setItem('GeesomeWallet:phone', phone);
