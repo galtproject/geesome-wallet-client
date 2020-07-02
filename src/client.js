@@ -209,8 +209,8 @@ module.exports = (options) => {
       return http.post('v1/get-wallet-by-email-and-password-hash', { email, emailPasswordHash }).then(wrapResponse);
     },
 
-    async getWalletByPhoneAndPasswordHash(phone, emailPasswordHash) {
-      return http.post('v1/get-wallet-by-phone-and-password-hash', { phone, emailPasswordHash }).then(wrapResponse);
+    async getWalletByPhoneAndPasswordHash(phone, phonePasswordHash) {
+      return http.post('v1/get-wallet-by-phone-and-password-hash', { phone, phonePasswordHash }).then(wrapResponse);
     },
 
     getAccountsAddresses() {
