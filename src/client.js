@@ -107,7 +107,7 @@ module.exports = (options) => {
         email = _login;
         await this.fetchCryptoMetadataByEmail();
 
-        const {emailPasswordDerivedKey, wallet: _wallet} = this.getWalletAndPasswordDerivedKeyByEmail(email, _password);
+        const {emailPasswordDerivedKey, wallet: _wallet} = await this.getWalletAndPasswordDerivedKeyByEmail(email, _password);
 
         wallet = _wallet;
         seed = lib.decrypt(emailPasswordDerivedKey, wallet.emailEncryptedSeed, cryptoMetadata.cryptoCounter);
@@ -116,7 +116,7 @@ module.exports = (options) => {
         phone = _login;
         await this.fetchCryptoMetadataByPhone();
 
-        const {phonePasswordDerivedKey, wallet: _wallet} = this.getWalletAndPasswordDerivedKeyByPhone(phone, _password);
+        const {phonePasswordDerivedKey, wallet: _wallet} = await this.getWalletAndPasswordDerivedKeyByPhone(phone, _password);
 
         wallet = _wallet;
         seed = lib.decrypt(phonePasswordDerivedKey, wallet.phoneEncryptedSeed, cryptoMetadata.cryptoCounter);
