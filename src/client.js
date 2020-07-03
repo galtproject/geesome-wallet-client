@@ -24,6 +24,7 @@ module.exports = (options) => {
 
   let email;
   let phone;
+  let username;
   let seed;
   let cryptoMetadata;
   let activeAccountIndex = 0;
@@ -92,6 +93,8 @@ module.exports = (options) => {
 
       const wallet = await http.post('v1/create-wallet', walletData).then(wrapResponse);
 
+      username = wallet.username;
+
       this.setEncryptedSeedToLocalStorage();
 
       return wallet;
@@ -139,6 +142,8 @@ module.exports = (options) => {
         throw Error('unknown_method');
       }
 
+      username = wallet.username;
+
       this.setEncryptedSeedToLocalStorage();
 
       return wallet;
@@ -175,6 +180,7 @@ module.exports = (options) => {
     setEncryptedSeedToLocalStorage() {
       localStorage.setItem('GeesomeWallet:email', email);
       localStorage.setItem('GeesomeWallet:phone', phone);
+      localStorage.setItem('GeesomeWallet:username', username);
       return this.getSession().then(({ secret }) => {
         if(!secret) {
           throw new Error('secret_is_null');
@@ -210,6 +216,10 @@ module.exports = (options) => {
 
     getLocalPhone() {
       return localStorage.getItem('GeesomeWallet:phone');
+    },
+
+    getLocalUsername() {
+      return localStorage.getItem('GeesomeWallet:username');
     },
 
     async getSession() {
