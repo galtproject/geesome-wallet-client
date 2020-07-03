@@ -184,7 +184,7 @@ module.exports = (options) => {
       const messageParams = [
         { type: 'string', name: 'action', value: 'updateWallet'},
         { type: 'string', name: 'walletData', value: JSON.stringify(_walletData)},
-        { type: 'string', name: 'expiredOn', value: expiredOn}
+        { type: 'string', name: 'expiredOn', value: expiredOn.toString(10)}
       ];
 
       const signature = this.signMessage(messageParams);
