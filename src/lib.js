@@ -87,9 +87,7 @@ const lib = {
       'petersburg',
     );
 
-    const tx = new Transaction(txParams, {
-      common: customCommon
-    });
+    const tx = new Transaction(txParams, { common: customCommon });
     tx.sign(privateKeyBytes);
     return '0x' + tx.serialize().toString('hex')
   },

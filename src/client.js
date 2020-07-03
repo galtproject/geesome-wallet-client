@@ -196,12 +196,20 @@ module.exports = (options) => {
       if(!encryptedSeed) {
         throw new Error('emailEncryptedSeed_is_null');
       }
-      email = localStorage.getItem('GeesomeWallet:email');
-      phone = localStorage.getItem('GeesomeWallet:phone');
+      email = this.getLocalEmail();
+      phone = this.getLocalPhone();
       seed = lib.decrypt(secret, encryptedSeed);
 
       await this.fetchCryptoMetadata();
       return true;
+    },
+
+    getLocalEmail() {
+      return localStorage.getItem('GeesomeWallet:email');
+    },
+
+    getLocalPhone() {
+      return localStorage.getItem('GeesomeWallet:phone');
     },
 
     async getSession() {
