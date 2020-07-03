@@ -162,6 +162,24 @@ module.exports = (options) => {
     },
 
     async updateWallet(_walletData) {
+      await this.getEncryptedSeedFromLocalStorage();
+
+      if((_walletData.phone || _walletData.email) && !_walletData.password) {
+        throw new Error("password_required")
+      }
+
+      if(_walletData.email) {
+        const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.email, cryptoMetadata.iterations, cryptoMetadata.kdf);
+        _walletData.emailEncryptedSeed = lib.encrypt(emailPasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
+        _walletData.emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _walletData.password);
+      }
+
+      if(_walletData.phone) {
+        const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
+        _walletData.phoneEncryptedSeed = lib.encrypt(phonePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
+        _walletData.phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _walletData.password);
+      }
+
       const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
       const messageParams = [
         { type: 'string', name: 'action', value: 'updateWallet'},
