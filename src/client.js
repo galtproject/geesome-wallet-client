@@ -107,20 +107,18 @@ module.exports = (options) => {
         email = _login;
         await this.fetchCryptoMetadataByEmail();
 
-        const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
-        const emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _password);
-        wallet = await this.getWalletByEmailAndPasswordHash(email, emailPasswordHash);
+        const {emailPasswordDerivedKey, wallet: _wallet} = this.getWalletAndPasswordDerivedKeyByEmail(email, _password);
 
+        wallet = _wallet;
         seed = lib.decrypt(emailPasswordDerivedKey, wallet.emailEncryptedSeed, cryptoMetadata.cryptoCounter);
 
       } else if(_method === 'phone') {
         phone = _login;
         await this.fetchCryptoMetadataByPhone();
 
-        const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_password, phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
-        const phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _password);
-        wallet = await this.getWalletByPhoneAndPasswordHash(phone, phonePasswordHash);
+        const {phonePasswordDerivedKey, wallet: _wallet} = this.getWalletAndPasswordDerivedKeyByPhone(phone, _password);
 
+        wallet = _wallet;
         seed = lib.decrypt(phonePasswordDerivedKey, wallet.phoneEncryptedSeed, cryptoMetadata.cryptoCounter);
 
       } else if(_method === 'wallet') {
@@ -147,6 +145,20 @@ module.exports = (options) => {
       this.setEncryptedSeedToLocalStorage();
 
       return wallet;
+    },
+
+    async getWalletAndPasswordDerivedKeyByEmail(_email, _password) {
+      const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_password, _email, cryptoMetadata.iterations, cryptoMetadata.kdf);
+      const emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _password);
+      const wallet = await this.getWalletByEmailAndPasswordHash(_email, emailPasswordHash);
+      return {emailPasswordDerivedKey, wallet};
+    },
+
+    async getWalletAndPasswordDerivedKeyByPhone(_phone, _password) {
+      const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_password, _phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
+      const phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _password);
+      const wallet = await this.getWalletByPhoneAndPasswordHash(_phone, phonePasswordHash);
+      return {phonePasswordDerivedKey, wallet};
     },
 
     async updateWallet(_walletData) {
@@ -194,6 +206,9 @@ module.exports = (options) => {
     },
 
     async getEncryptedSeedFromLocalStorage() {
+      if(email && phone && seed) {
+        return true;
+      }
       const { secret } = await this.getSession();
       if(!secret) {
         throw new Error('secret_is_null');
