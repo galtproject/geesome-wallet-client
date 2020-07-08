@@ -66,8 +66,11 @@ module.exports = (options) => {
       })
     },
 
-    async register(_email, _phone, _password, _additionalData = {}) {
+    async register(_email, _phone, _username, _password, _additionalData = {}) {
       email = _email;
+      username = _username;
+      phone = _phone;
+
       cryptoMetadata = lib.getDefaultCryptoMetadata();
       seed = lib.generateMnemonic();
       const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
@@ -91,9 +94,13 @@ module.exports = (options) => {
         walletData.phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _password);
       }
 
-      const wallet = await http.post('v1/create-wallet', walletData).then(wrapResponse);
+      if(_username) {
+        const usernamePasswordDerivedKey = lib.getPasswordDerivedKey(_password, _username, cryptoMetadata.iterations, cryptoMetadata.kdf);
+        walletData.usernameEncryptedSeed = lib.encrypt(usernamePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
+        walletData.usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _password);
+      }
 
-      username = wallet.username;
+      const wallet = await http.post('v1/create-wallet', walletData).then(wrapResponse);
 
       this.setEncryptedSeedToLocalStorage();
 
@@ -121,6 +128,15 @@ module.exports = (options) => {
         wallet = _wallet;
         seed = lib.decrypt(phonePasswordDerivedKey, wallet.phoneEncryptedSeed, cryptoMetadata.cryptoCounter);
 
+      } else if(_method === 'username') {
+        username = _login;
+        await this.fetchCryptoMetadataByUsername();
+
+        const {phonePasswordDerivedKey, wallet: _wallet} = await this.getWalletAndPasswordDerivedKeyByUsername(username, _password);
+
+        wallet = _wallet;
+        seed = lib.decrypt(phonePasswordDerivedKey, wallet.usernameEncryptedSeed, cryptoMetadata.cryptoCounter);
+
       } else if(_method === 'wallet') {
         wallet = _login;
 
@@ -134,13 +150,15 @@ module.exports = (options) => {
           email = wallet.email;
           const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_password, email, cryptoMetadata.iterations, cryptoMetadata.kdf);
           seed = lib.decrypt(emailPasswordDerivedKey, wallet.emailEncryptedSeed, cryptoMetadata.cryptoCounter);
+        } else if(wallet.username) {
+          username = wallet.username;
+          const usernamePasswordDerivedKey = lib.getPasswordDerivedKey(_password, username, cryptoMetadata.iterations, cryptoMetadata.kdf);
+          seed = lib.decrypt(usernamePasswordDerivedKey, wallet.usernameEncryptedSeed, cryptoMetadata.cryptoCounter);
         }
 
       } else {
         throw Error('unknown_method');
       }
-
-      username = wallet.username;
 
       this.setEncryptedSeedToLocalStorage();
 
@@ -161,6 +179,13 @@ module.exports = (options) => {
       return {phonePasswordDerivedKey, wallet};
     },
 
+    async getWalletAndPasswordDerivedKeyByUsername(_username, _password) {
+      const usernamePasswordDerivedKey = lib.getPasswordDerivedKey(_password, _username, cryptoMetadata.iterations, cryptoMetadata.kdf);
+      const usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _password);
+      const wallet = await this.getWalletByUsernameAndPasswordHash(_username, usernamePasswordHash);
+      return {usernamePasswordDerivedKey, wallet};
+    },
+
     async updateWallet(_walletData) {
       await this.getEncryptedSeedFromLocalStorage();
 
@@ -178,6 +203,12 @@ module.exports = (options) => {
         const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
         _walletData.phoneEncryptedSeed = lib.encrypt(phonePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
         _walletData.phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _walletData.password);
+      }
+
+      if(_walletData.username) {
+        const usernamePasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.username, cryptoMetadata.iterations, cryptoMetadata.kdf);
+        _walletData.usernameEncryptedSeed = lib.encrypt(usernamePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
+        _walletData.usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _walletData.password);
       }
 
       const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
@@ -224,7 +255,7 @@ module.exports = (options) => {
     },
 
     async getEncryptedSeedFromLocalStorage() {
-      if(email && phone && seed) {
+      if((email || phone || username) && seed) {
         return true;
       }
       const { secret } = await this.getSession();
@@ -237,6 +268,7 @@ module.exports = (options) => {
       }
       email = this.getLocalEmail();
       phone = this.getLocalPhone();
+      username = this.getLocalUsername();
       seed = lib.decrypt(secret, encryptedSeed);
 
       await this.fetchCryptoMetadata();
@@ -264,6 +296,8 @@ module.exports = (options) => {
         await this.fetchCryptoMetadataByEmail();
       } else if(phone && phone !== 'undefined' && phone !== 'null') {
         await this.fetchCryptoMetadataByPhone();
+      } else if(username && username !== 'undefined' && username !== 'null') {
+        await this.fetchCryptoMetadataByUsername();
       }
     },
 
@@ -275,6 +309,10 @@ module.exports = (options) => {
       cryptoMetadata = await this.getCryptoMetadataByPhone(phone);
     },
 
+    async fetchCryptoMetadataByUsername() {
+      cryptoMetadata = await this.getCryptoMetadataByUsername(username);
+    },
+
     async getCryptoMetadataByEmail(_email) {
       return http.post('v1/get-crypto-metadata-by-email', { email: _email }).then(wrapResponse);
     },
@@ -283,12 +321,20 @@ module.exports = (options) => {
       return http.post('v1/get-crypto-metadata-by-phone', { phone: _phone }).then(wrapResponse);
     },
 
+    async getCryptoMetadataByUsername(_username) {
+      return http.post('v1/get-crypto-metadata-by-username', { username: _username }).then(wrapResponse);
+    },
+
     async getWalletByEmailAndPasswordHash(email, emailPasswordHash) {
       return http.post('v1/get-wallet-by-email-and-password-hash', { email, emailPasswordHash }).then(wrapResponse);
     },
 
     async getWalletByPhoneAndPasswordHash(phone, phonePasswordHash) {
       return http.post('v1/get-wallet-by-phone-and-password-hash', { phone, phonePasswordHash }).then(wrapResponse);
+    },
+
+    async getWalletByUsernameAndPasswordHash(username, usernamePasswordHash) {
+      return http.post('v1/get-wallet-by-username-and-password-hash', { username, usernamePasswordHash }).then(wrapResponse);
     },
 
     getAccountsAddresses() {
