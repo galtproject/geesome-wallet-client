@@ -76,7 +76,9 @@ module.exports = (options) => {
       const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
 
       const walletData = {
-        email: _email,
+        email,
+        username,
+        phone,
         primaryAddress: primaryWallet.address,
         cryptoMetadataJson: JSON.stringify(cryptoMetadata),
         ..._additionalData
