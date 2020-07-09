@@ -281,7 +281,7 @@ module.exports = (options) => {
     },
 
     setEncryptedSeedToLocalStorage(wallet, _seed) {
-      if(!localStorage) {
+      if(!global.localStorage) {
         return;
       }
       const {_email, _phone, _username} = wallet;
