@@ -100,11 +100,36 @@ module.exports = (options) => {
         walletData.usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _password);
       }
 
-      const wallet = await http.post('v1/create-wallet', walletData).then(wrapResponse);
+      const {wallet, pendingWallet} = await http.post('v1/register', walletData).then(wrapResponse);
+
+      this.setEncryptedSeedToLocalStorage();
+
+      return {wallet, pendingWallet};
+    },
+
+    async confirmWallet(confirmationMethod, value, code) {
+      const wallet = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
 
       this.setEncryptedSeedToLocalStorage();
 
       return wallet;
+    },
+
+    async confirmWalletByAdmin(pendingWalletId, confirmMethods) {
+      await this.getEncryptedSeedFromLocalStorage();
+
+      const messageParams = [
+        { type: 'string', name: 'action', value: 'confirmPendingWallet'},
+        { type: 'string', name: 'pendingWalletId', value: pendingWalletId.toString(10)},
+        { type: 'string', name: 'confirmMethods', value: confirmMethods}
+      ];
+
+      const signature = this.signMessage(messageParams);
+      return http.post('v1/admin/confirm-wallet', {
+        signature,
+        pendingWalletId,
+        confirmMethods
+      }).then(wrapResponse);
     },
 
     async login(_login, _password, _method = 'email') {
