@@ -110,18 +110,18 @@ module.exports = (options) => {
 
       this.setEncryptedSeedToLocalStorage(wallet || pendingWallet, seed);
 
-      return {wallet, pendingWallet};
+      return {wallet, pendingWallet, seed};
     },
 
     async registerByWorker(_email, _phone, _username, _password, _additionalData = {}) {
-      const {wallet, pendingWallet} = await this.worker.callMethod('register', {
+      const {wallet, pendingWallet, seed: _seed} = await this.worker.callMethod('register', {
         options,
         args: [_email, _phone, _username, _password, _additionalData]
       });
 
-      this.setEncryptedSeedToLocalStorage(wallet || pendingWallet, seed);
+      this.setEncryptedSeedToLocalStorage(wallet || pendingWallet, _seed);
 
-      return {wallet, pendingWallet};
+      return {wallet, pendingWallet, seed: _seed};
     },
 
     async confirmWallet(confirmationMethod, value, code) {
