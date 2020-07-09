@@ -44,6 +44,10 @@ module.exports = (options) => {
   };
 
   return {
+    setWorker(_worker) {
+      this.worker = _worker;
+    },
+
     isReady() {
       return !!seed && !!cryptoMetadata;
     },
@@ -104,7 +108,18 @@ module.exports = (options) => {
 
       const {wallet, pendingWallet} = await http.post('v1/register', walletData).then(wrapResponse);
 
-      this.setEncryptedSeedToLocalStorage();
+      this.setEncryptedSeedToLocalStorage(wallet || pendingWallet, seed);
+
+      return {wallet, pendingWallet};
+    },
+
+    async registerByWorker(_email, _phone, _username, _password, _additionalData = {}) {
+      const {wallet, pendingWallet} = await this.worker.callMethod('register', {
+        options,
+        args: [_email, _phone, _username, _password, _additionalData]
+      });
+
+      this.setEncryptedSeedToLocalStorage(wallet || pendingWallet, seed);
 
       return {wallet, pendingWallet};
     },
@@ -112,7 +127,7 @@ module.exports = (options) => {
     async confirmWallet(confirmationMethod, value, code) {
       const wallet = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
 
-      this.setEncryptedSeedToLocalStorage();
+      this.setEncryptedSeedToLocalStorage(wallet, seed);
 
       return wallet;
     },
@@ -187,7 +202,7 @@ module.exports = (options) => {
         throw Error('unknown_method');
       }
 
-      this.setEncryptedSeedToLocalStorage();
+      this.setEncryptedSeedToLocalStorage(wallet, seed);
 
       return wallet;
     },
@@ -265,18 +280,26 @@ module.exports = (options) => {
       return seed;
     },
 
-    setEncryptedSeedToLocalStorage() {
-      localStorage.setItem('GeesomeWallet:email', email);
-      localStorage.setItem('GeesomeWallet:phone', phone);
-      localStorage.setItem('GeesomeWallet:username', username);
+    setEncryptedSeedToLocalStorage(wallet, _seed) {
+      if(!localStorage) {
+        return;
+      }
+      const {_email, _phone, _username} = wallet;
+      localStorage.setItem('GeesomeWallet:email', _email);
+      localStorage.setItem('GeesomeWallet:phone', _phone);
+      localStorage.setItem('GeesomeWallet:username', _username);
+      email = _email;
+      phone = _phone;
+      username = _username;
+      seed = _seed;
       return this.getSession().then(({ secret }) => {
         if(!secret) {
           throw new Error('secret_is_null');
         }
-        if(!seed) {
+        if(!_seed) {
           throw new Error('seed_is_null');
         }
-        localStorage.setItem('GeesomeWallet:encryptedSeed', lib.encrypt(secret, seed));
+        localStorage.setItem('GeesomeWallet:encryptedSeed', lib.encrypt(secret, _seed));
         return true;
       });
     },
