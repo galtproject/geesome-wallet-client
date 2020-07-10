@@ -124,6 +124,14 @@ module.exports = (options) => {
       return {wallet, pendingWallet, seed: _seed};
     },
 
+    async preferRegister(_email, _phone, _username, _password, _additionalData = {}) {
+      if(this.worker) {
+        return this.registerByWorker(_email, _phone, _username, _password, _additionalData);
+      } else {
+        return this.register(_email, _phone, _username, _password, _additionalData);
+      }
+    },
+
     async confirmWallet(confirmationMethod, value, code) {
       const wallet = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
 
@@ -204,7 +212,26 @@ module.exports = (options) => {
 
       this.setEncryptedSeedToLocalStorage(wallet, seed);
 
+      return {seed, wallet};
+    },
+
+    async loginByWorker(_login, _password, _method = 'email') {
+      const {wallet, seed: _seed} = await this.worker.callMethod('login', {
+        options,
+        args: [_login, _password, _method]
+      });
+
+      this.setEncryptedSeedToLocalStorage(wallet, _seed);
+
       return wallet;
+    },
+
+    async preferLogin(_login, _password, _method = 'email') {
+      if(this.worker) {
+        return this.loginByWorker(_login, _password, _method);
+      } else {
+        return this.login(_login, _password, _method);
+      }
     },
 
     async getWalletAndPasswordDerivedKeyByEmail(_email, _password) {
