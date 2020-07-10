@@ -87,11 +87,11 @@ module.exports = (options) => {
     },
     signMessage: async function (msgParams, cb) {
       await client.waitForReady().catch(cb);
-      cb(null, client.signMessage(msgParams));
+      cb(null, client.signMessage(msgParams.data));
     },
     signTypedMessage: async function (msgParams, cb) {
       await client.waitForReady().catch(cb);
-      cb(null, client.signTypedData(msgParams));
+      cb(null, client.signMessage(msgParams.data));
     }
   }));
 
