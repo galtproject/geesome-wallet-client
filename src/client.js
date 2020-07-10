@@ -311,7 +311,7 @@ module.exports = (options) => {
       if(!global.localStorage) {
         return;
       }
-      const {_email, _phone, _username} = wallet;
+      const {email: _email, phone: _phone, username: _username} = wallet;
       localStorage.setItem('GeesomeWallet:email', _email);
       localStorage.setItem('GeesomeWallet:phone', _phone);
       localStorage.setItem('GeesomeWallet:username', _username);
