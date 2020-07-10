@@ -141,6 +141,10 @@ module.exports = (options) => {
       return {wallet, pendingWallet};
     },
 
+    async resendConfirmation(confirmationMethod) {
+      return http.post('v1/resend-confirmation', {confirmationMethod}).then(wrapResponse);
+    },
+
     async confirmWalletByAdmin(pendingWalletId, confirmMethods) {
       await this.getEncryptedSeedFromLocalStorage();
 
