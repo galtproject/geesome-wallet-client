@@ -223,7 +223,7 @@ module.exports = (options) => {
 
       this.setEncryptedSeedToLocalStorage(wallet, _seed);
 
-      return wallet;
+      return {wallet, seed: _seed};
     },
 
     async preferLogin(_login, _password, _method = 'email') {
