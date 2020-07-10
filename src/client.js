@@ -133,11 +133,11 @@ module.exports = (options) => {
     },
 
     async confirmWallet(confirmationMethod, value, code) {
-      const {wallet} = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
+      const {wallet, pendingWallet} = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
 
       this.setEncryptedSeedToLocalStorage(wallet, seed);
 
-      return {wallet};
+      return {wallet, pendingWallet};
     },
 
     async confirmWalletByAdmin(pendingWalletId, confirmMethods) {
