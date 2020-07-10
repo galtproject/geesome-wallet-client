@@ -296,6 +296,25 @@ module.exports = (options) => {
       }).then(wrapResponse);
     },
 
+    async updateWalletByWorker(_walletData) {
+      const {wallet, pendingWallet} = await this.worker.callMethod('updateWallet', {
+        options,
+        args: [_walletData]
+      });
+
+      this.setEncryptedSeedToLocalStorage(wallet);
+
+      return {wallet, pendingWallet};
+    },
+
+    async preferUpdateWallet(_walletData) {
+      if(this.worker) {
+        return this.updateWalletByWorker(_walletData);
+      } else {
+        return this.updateWallet(_walletData);
+      }
+    },
+
     async exportSeed() {
       if (seed) {
         return seed;
