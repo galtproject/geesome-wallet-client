@@ -137,7 +137,7 @@ module.exports = (options) => {
 
       this.setEncryptedSeedToLocalStorage(wallet, seed);
 
-      return wallet;
+      return {wallet};
     },
 
     async confirmWalletByAdmin(pendingWalletId, confirmMethods) {
