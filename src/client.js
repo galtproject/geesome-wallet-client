@@ -319,6 +319,7 @@ module.exports = (options) => {
       phone = _phone;
       username = _username;
       seed = _seed;
+      cryptoMetadata = JSON.parse(wallet.cryptoMetadataJson);
       return this.getSession().then(({ secret }) => {
         if(!secret) {
           throw new Error('secret_is_null');
