@@ -27,19 +27,19 @@ module.exports = (options) => {
   }
 
   if(email && password) {
-    client.login(email, password, 'email').catch((err) => {
+    client.preferLogin(email, password, 'email').catch((err) => {
       console.log('login error', err);
     });
   } else if(phone && password) {
-    client.login(phone, password, 'phone').catch((err) => {
+    client.preferLogin(phone, password, 'phone').catch((err) => {
       console.log('login error', err);
     });
   } else if(username && password) {
-    client.login(username, password, 'username').catch((err) => {
+    client.preferLogin(username, password, 'username').catch((err) => {
       console.log('login error', err);
     });
   } else if(wallet && password) {
-    client.login(wallet, password, 'wallet').catch((err) => {
+    client.preferLogin(wallet, password, 'wallet').catch((err) => {
       console.log('login error', err);
     });
   } else {
