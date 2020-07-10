@@ -182,10 +182,10 @@ module.exports = (options) => {
         username = _login;
         await this.fetchCryptoMetadataByUsername();
 
-        const {phonePasswordDerivedKey, wallet: _wallet} = await this.getWalletAndPasswordDerivedKeyByUsername(username, _password);
+        const {usernamePasswordDerivedKey, wallet: _wallet} = await this.getWalletAndPasswordDerivedKeyByUsername(username, _password);
 
         wallet = _wallet;
-        seed = lib.decrypt(phonePasswordDerivedKey, wallet.usernameEncryptedSeed, cryptoMetadata.cryptoCounter);
+        seed = lib.decrypt(usernamePasswordDerivedKey, wallet.usernameEncryptedSeed, cryptoMetadata.cryptoCounter);
 
       } else if(_method === 'wallet') {
         wallet = _login;
