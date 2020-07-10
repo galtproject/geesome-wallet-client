@@ -9,6 +9,7 @@
 
 const axios = require('axios');
 const lib = require('./lib');
+const clone = require('lodash/clone');
 
 module.exports = (options) => {
   let { backendUrl } = options;
@@ -261,6 +262,9 @@ module.exports = (options) => {
       if(!cryptoMetadata) {
         cryptoMetadata = _walletData.cryptoMetadata;
       }
+      if(!seed) {
+        seed = _walletData.seed;
+      }
 
       if((_walletData.phone || _walletData.email) && !_walletData.password) {
         throw new Error("password_required")
@@ -302,9 +306,11 @@ module.exports = (options) => {
 
     async updateWalletByWorker(_walletData) {
       await this.getEncryptedSeedFromLocalStorage();
+      _walletData = clone(_walletData);
       if(!_walletData.cryptoMetadata) {
         _walletData.cryptoMetadata = cryptoMetadata;
       }
+      _walletData.seed = seed;
       const {wallet, pendingWallet} = await this.worker.callMethod('updateWallet', {
         options,
         args: [_walletData]
