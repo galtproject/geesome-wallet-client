@@ -133,7 +133,7 @@ module.exports = (options) => {
     },
 
     async confirmWallet(confirmationMethod, value, code) {
-      const wallet = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
+      const {wallet} = await http.post('v1/confirm-wallet', {confirmationMethod, value, code}).then(wrapResponse);
 
       this.setEncryptedSeedToLocalStorage(wallet, seed);
 
