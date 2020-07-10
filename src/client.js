@@ -258,6 +258,10 @@ module.exports = (options) => {
     async updateWallet(_walletData) {
       await this.getEncryptedSeedFromLocalStorage();
 
+      if(!cryptoMetadata) {
+        cryptoMetadata = _walletData.cryptoMetadata;
+      }
+
       if((_walletData.phone || _walletData.email) && !_walletData.password) {
         throw new Error("password_required")
       }
@@ -297,6 +301,10 @@ module.exports = (options) => {
     },
 
     async updateWalletByWorker(_walletData) {
+      await this.getEncryptedSeedFromLocalStorage();
+      if(!_walletData.cryptoMetadata) {
+        _walletData.cryptoMetadata = cryptoMetadata;
+      }
       const {wallet, pendingWallet} = await this.worker.callMethod('updateWallet', {
         options,
         args: [_walletData]
