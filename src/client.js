@@ -352,6 +352,9 @@ module.exports = (options) => {
     },
 
     async getEncryptedSeedFromLocalStorage() {
+      if(!global.localStorage) {
+        return false;
+      }
       if((email || phone || username) && seed) {
         return true;
       }
