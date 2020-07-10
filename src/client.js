@@ -239,6 +239,9 @@ module.exports = (options) => {
       const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_password, _email, cryptoMetadata.iterations, cryptoMetadata.kdf);
       const emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _password);
       const wallet = await this.getWalletByEmailAndPasswordHash(_email, emailPasswordHash);
+      if(!wallet) {
+        throw new Error('wallet_not_found');
+      }
       return {emailPasswordDerivedKey, wallet};
     },
 
@@ -246,6 +249,9 @@ module.exports = (options) => {
       const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_password, _phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
       const phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _password);
       const wallet = await this.getWalletByPhoneAndPasswordHash(_phone, phonePasswordHash);
+      if(!wallet) {
+        throw new Error('wallet_not_found');
+      }
       return {phonePasswordDerivedKey, wallet};
     },
 
@@ -253,6 +259,9 @@ module.exports = (options) => {
       const usernamePasswordDerivedKey = lib.getPasswordDerivedKey(_password, _username, cryptoMetadata.iterations, cryptoMetadata.kdf);
       const usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _password);
       const wallet = await this.getWalletByUsernameAndPasswordHash(_username, usernamePasswordHash);
+      if(!wallet) {
+        throw new Error('wallet_not_found');
+      }
       return {usernamePasswordDerivedKey, wallet};
     },
 
@@ -418,14 +427,23 @@ module.exports = (options) => {
 
     async fetchCryptoMetadataByEmail() {
       cryptoMetadata = await this.getCryptoMetadataByEmail(email);
+      if(!cryptoMetadata) {
+        throw new Error('metadata_not_found');
+      }
     },
 
     async fetchCryptoMetadataByPhone() {
       cryptoMetadata = await this.getCryptoMetadataByPhone(phone);
+      if(!cryptoMetadata) {
+        throw new Error('metadata_not_found');
+      }
     },
 
     async fetchCryptoMetadataByUsername() {
       cryptoMetadata = await this.getCryptoMetadataByUsername(username);
+      if(!cryptoMetadata) {
+        throw new Error('metadata_not_found');
+      }
     },
 
     async getCryptoMetadataByEmail(_email) {
