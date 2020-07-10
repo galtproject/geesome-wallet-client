@@ -259,6 +259,7 @@ module.exports = (options) => {
     async updateWallet(_walletData) {
       await this.getEncryptedSeedFromLocalStorage();
 
+      // get data in case updateWallet by worker
       if(!cryptoMetadata) {
         cryptoMetadata = _walletData.cryptoMetadata;
       }
