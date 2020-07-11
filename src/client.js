@@ -10,6 +10,7 @@
 const axios = require('axios');
 const lib = require('./lib');
 const clone = require('lodash/clone');
+const ethers = require('ethers');
 
 module.exports = (options) => {
   let { backendUrl } = options;
@@ -237,6 +238,33 @@ module.exports = (options) => {
       } else {
         return this.login(_login, _password, _method);
       }
+    },
+
+    async getAuthMessage(primaryAddress) {
+      return http.post('v1/get-auth-message', {primaryAddress}).then(wrapResponse);
+    },
+
+    async getWalletBySignature(primaryAddress, signature) {
+      return http.post('v1/get-wallet-by-signature', {primaryAddress, signature}).then(wrapResponse);
+    },
+
+    async getWalletByPrivateKey(privateKey) {
+      const ethersWallet = new ethers.Wallet(privateKey);
+      const authMessage = await this.getAuthMessage(ethersWallet.address);
+
+      const signature = lib.signMessage(privateKey, [
+        { type: 'string', name: 'code', value: authMessage.code}
+      ]);
+
+      return this.getWalletBySignature(ethersWallet.address, signature);
+    },
+
+    async getWalletBySeed(seed, cryptoMetadata = null) {
+      if(cryptoMetadata) {
+        cryptoMetadata = lib.getDefaultCryptoMetadata();
+      }
+      const ethersWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
+      return this.getWalletByPrivateKey(ethersWallet.privateKey);
     },
 
     async getWalletAndPasswordDerivedKeyByEmail(_email, _password) {
