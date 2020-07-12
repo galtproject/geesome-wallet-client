@@ -37,7 +37,7 @@ const lib = {
   },
 
   getKeypairByPrivateKey(privateKey) {
-    const wallet = ethers.Wallet(privateKey);
+    const wallet = new ethers.Wallet(privateKey);
     return {
       address: wallet.address,
       privateKey: wallet.privateKey,
