@@ -535,7 +535,7 @@ module.exports = (options) => {
       const signature = this.signMessage([
         { type: 'string', name: 'project', value: 'GeesomeWallet'},
         { type: 'string', name: 'action', value: 'deleteWallet'},
-        { type: 'string', name: 'code', value: wallet.id.toString()}
+        { type: 'string', name: 'walletId', value: wallet.id.toString()}
       ]);
 
       return this.deleteWalletBySignature(signature);
