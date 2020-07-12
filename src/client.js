@@ -525,6 +525,21 @@ module.exports = (options) => {
 
     signTypedData(dataParams) {
       return lib.signTypedData(getActiveAccount().privateKey, dataParams);
-    }
+    },
+
+    async deleteWallet() {
+      const {wallet} = await this.getSession();
+      const signature = this.signMessage([
+        { type: 'string', name: 'project', value: 'GeesomeWallet'},
+        { type: 'string', name: 'action', value: 'deleteWallet'},
+        { type: 'string', name: 'code', value: wallet.id.toString()}
+      ]);
+
+      return this.deleteWalletBySignature(signature);
+    },
+
+    async deleteWalletBySignature(signature) {
+      return http.post('v1/delete-wallet', { signature }).then(wrapResponse);
+    },
   }
 };
