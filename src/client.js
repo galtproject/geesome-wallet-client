@@ -78,7 +78,8 @@ module.exports = (options) => {
       phone = _phone;
 
       cryptoMetadata = lib.getDefaultCryptoMetadata();
-      seed = lib.generateMnemonic();
+      const {seed: _seed} = _additionalData;
+      seed = _seed || lib.generateMnemonic();
       const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
 
       const walletData = {
