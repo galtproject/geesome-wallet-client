@@ -260,7 +260,7 @@ module.exports = (options) => {
     },
 
     async getWalletBySeed(seed, cryptoMetadata = null) {
-      if(cryptoMetadata) {
+      if(!cryptoMetadata) {
         cryptoMetadata = lib.getDefaultCryptoMetadata();
       }
       const ethersWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
