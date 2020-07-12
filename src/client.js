@@ -151,6 +151,7 @@ module.exports = (options) => {
       await this.getEncryptedSeedFromLocalStorage();
 
       const messageParams = [
+        { type: 'string', name: 'project', value: 'GeesomeWallet'},
         { type: 'string', name: 'action', value: 'confirmPendingWallet'},
         { type: 'string', name: 'pendingWalletId', value: pendingWalletId.toString(10)},
         { type: 'string', name: 'confirmMethods', value: confirmMethods}
@@ -254,6 +255,8 @@ module.exports = (options) => {
       const authMessage = await this.getAuthMessage(ethersWallet.address);
 
       const signature = lib.signMessage(privateKey, [
+        { type: 'string', name: 'project', value: 'GeesomeWallet'},
+        { type: 'string', name: 'action', value: 'getWallet'},
         { type: 'string', name: 'code', value: authMessage.code}
       ]);
 
@@ -333,6 +336,7 @@ module.exports = (options) => {
 
       const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
       const messageParams = [
+        { type: 'string', name: 'project', value: 'GeesomeWallet'},
         { type: 'string', name: 'action', value: 'updateWallet'},
         { type: 'string', name: 'walletData', value: JSON.stringify(_walletData)},
         { type: 'string', name: 'expiredOn', value: expiredOn.toString(10)}
