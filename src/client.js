@@ -529,6 +529,9 @@ module.exports = (options) => {
 
     async deleteWallet() {
       const {wallet} = await this.getSession();
+
+      await this.getEncryptedSeedFromLocalStorage();
+
       const signature = this.signMessage([
         { type: 'string', name: 'project', value: 'GeesomeWallet'},
         { type: 'string', name: 'action', value: 'deleteWallet'},
