@@ -251,8 +251,8 @@ module.exports = (options) => {
     },
 
     async getWalletByPrivateKey(privateKey) {
-      const ethersWallet = new ethers.Wallet(privateKey);
-      const authMessage = await this.getAuthMessage(ethersWallet.address);
+      const keyPair = lib.getKeypairByPrivateKey(privateKey);
+      const authMessage = await this.getAuthMessage(keyPair.address);
 
       const signature = lib.signMessage(privateKey, [
         { type: 'string', name: 'project', value: 'GeesomeWallet'},
@@ -260,7 +260,7 @@ module.exports = (options) => {
         { type: 'string', name: 'code', value: authMessage.code}
       ]);
 
-      return this.getWalletBySignature(ethersWallet.address, signature);
+      return this.getWalletBySignature(keyPair.address, signature);
     },
 
     async getWalletBySeed(seed, cryptoMetadata = null) {

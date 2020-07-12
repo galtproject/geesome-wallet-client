@@ -36,6 +36,14 @@ const lib = {
     };
   },
 
+  getKeypairByPrivateKey(privateKey) {
+    const wallet = ethers.Wallet(privateKey);
+    return {
+      address: wallet.address,
+      privateKey: wallet.privateKey,
+    };
+  },
+
   getPasswordDerivedKey(password, email, iterations = 100000, kfd = 'sha512') {
     email = email.toLowerCase();
     return aesjs.utils.hex.fromBytes(pbkdf2.pbkdf2Sync(password, email, iterations, 32, kfd));
