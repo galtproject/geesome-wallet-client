@@ -320,18 +320,30 @@ module.exports = (options) => {
         const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.email, cryptoMetadata.iterations, cryptoMetadata.kdf);
         _walletData.emailEncryptedSeed = lib.encrypt(emailPasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
         _walletData.emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _walletData.password);
+      } else {
+        _walletData.email = null;
+        delete _walletData.emailEncryptedSeed;
+        delete _walletData.emailPasswordHash;
       }
 
       if(_walletData.phone) {
         const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
         _walletData.phoneEncryptedSeed = lib.encrypt(phonePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
         _walletData.phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _walletData.password);
+      } else {
+        _walletData.phone = null;
+        delete _walletData.phoneEncryptedSeed;
+        delete _walletData.phonePasswordHash;
       }
 
       if(_walletData.username) {
         const usernamePasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.username, cryptoMetadata.iterations, cryptoMetadata.kdf);
         _walletData.usernameEncryptedSeed = lib.encrypt(usernamePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
         _walletData.usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _walletData.password);
+      } else {
+        _walletData.username = null;
+        delete _walletData.usernameEncryptedSeed;
+        delete _walletData.usernamePasswordHash;
       }
 
       const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
