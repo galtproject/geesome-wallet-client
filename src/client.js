@@ -322,8 +322,8 @@ module.exports = (options) => {
         _walletData.emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _walletData.password);
       } else {
         _walletData.email = null;
-        delete _walletData.emailEncryptedSeed;
-        delete _walletData.emailPasswordHash;
+        _walletData.emailEncryptedSeed = null;
+        _walletData.emailPasswordHash = null;
       }
 
       if(_walletData.phone) {
@@ -332,8 +332,8 @@ module.exports = (options) => {
         _walletData.phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _walletData.password);
       } else {
         _walletData.phone = null;
-        delete _walletData.phoneEncryptedSeed;
-        delete _walletData.phonePasswordHash;
+        _walletData.phoneEncryptedSeed = null;
+        _walletData.phonePasswordHash = null;
       }
 
       if(_walletData.username) {
@@ -342,8 +342,8 @@ module.exports = (options) => {
         _walletData.usernamePasswordHash = lib.getPasswordHash(usernamePasswordDerivedKey, _walletData.password);
       } else {
         _walletData.username = null;
-        delete _walletData.usernameEncryptedSeed;
-        delete _walletData.usernamePasswordHash;
+        _walletData.usernameEncryptedSeed = null;
+        _walletData.usernamePasswordHash = null;
       }
 
       const expiredOn = Math.round(new Date().getTime() / 1000) + 60 * 5;
