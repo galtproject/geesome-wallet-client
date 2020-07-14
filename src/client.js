@@ -31,14 +31,17 @@ module.exports = (options) => {
   let cryptoMetadata;
   let activeAccountIndex = 0;
   let accountsByIndexes = {
-
+    //seed => index => keypair
   };
 
   const getAccountByIndex = (index) => {
-    if(!accountsByIndexes[index]) {
-      accountsByIndexes[index] = lib.getKeypairByMnemonic(seed, index, cryptoMetadata.derivationPath);
+    if(!accountsByIndexes[seed]) {
+      accountsByIndexes[seed] = {};
     }
-    return accountsByIndexes[index];
+    if(!accountsByIndexes[seed][index]) {
+      accountsByIndexes[seed][index] = lib.getKeypairByMnemonic(seed, index, cryptoMetadata.derivationPath);
+    }
+    return accountsByIndexes[seed][index];
   };
 
   const getActiveAccount = () => {
