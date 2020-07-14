@@ -372,7 +372,9 @@ module.exports = (options) => {
       if(!_walletData.cryptoMetadata) {
         _walletData.cryptoMetadata = cryptoMetadata;
       }
-      _walletData.seed = seed;
+      if(!_walletData.seed) {
+        _walletData.seed = seed;
+      }
       const {wallet, pendingWallet} = await this.worker.callMethod('updateWallet', {
         options,
         args: [_walletData]
