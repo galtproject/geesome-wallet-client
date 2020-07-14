@@ -305,10 +305,10 @@ module.exports = (options) => {
       await this.getEncryptedSeedFromLocalStorage();
 
       // get data in case updateWallet by worker
-      if(!cryptoMetadata) {
+      if(_walletData.cryptoMetadata) {
         cryptoMetadata = _walletData.cryptoMetadata;
       }
-      if(!seed) {
+      if(_walletData.seed) {
         seed = _walletData.seed;
       }
 
