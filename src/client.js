@@ -150,9 +150,7 @@ module.exports = (options) => {
       return http.post('v1/resend-confirmation', {confirmationMethod}).then(wrapResponse);
     },
 
-    async confirmWalletByAdmin(pendingWalletId, confirmMethods) {
-      await this.getEncryptedSeedFromLocalStorage();
-
+    async confirmWalletByAdmin(pendingWalletId, confirmMethods, adminPrivateKey = null) {
       const messageParams = [
         { type: 'string', name: 'project', value: 'GeesomeWallet'},
         { type: 'string', name: 'action', value: 'confirmPendingWallet'},
@@ -160,7 +158,13 @@ module.exports = (options) => {
         { type: 'string', name: 'confirmMethods', value: confirmMethods}
       ];
 
-      const signature = this.signMessage(messageParams);
+      let signature;
+      if(adminPrivateKey) {
+        signature = lib.signTypedData(adminPrivateKey, messageParams);
+      } else {
+        await this.getEncryptedSeedFromLocalStorage();
+        signature = this.signMessage(messageParams);
+      }
       return http.post('v1/admin/confirm-wallet', {
         signature,
         pendingWalletId,
