@@ -327,7 +327,7 @@ module.exports = (options) => {
         const emailPasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.email, cryptoMetadata.iterations, cryptoMetadata.kdf);
         _walletData.emailEncryptedSeed = lib.encrypt(emailPasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
         _walletData.emailPasswordHash = lib.getPasswordHash(emailPasswordDerivedKey, _walletData.password);
-      } else {
+      } else if(_walletData.email === null || _walletData.email === '') {
         _walletData.email = null;
         _walletData.emailEncryptedSeed = null;
         _walletData.emailPasswordHash = null;
@@ -337,7 +337,7 @@ module.exports = (options) => {
         const phonePasswordDerivedKey = lib.getPasswordDerivedKey(_walletData.password, _walletData.phone, cryptoMetadata.iterations, cryptoMetadata.kdf);
         _walletData.phoneEncryptedSeed = lib.encrypt(phonePasswordDerivedKey, seed, cryptoMetadata.cryptoCounter);
         _walletData.phonePasswordHash = lib.getPasswordHash(phonePasswordDerivedKey, _walletData.password);
-      } else {
+      } else if(_walletData.phone === null || _walletData.phone === '') {
         _walletData.phone = null;
         _walletData.phoneEncryptedSeed = null;
         _walletData.phonePasswordHash = null;
