@@ -98,17 +98,10 @@ module.exports = (options) => {
   // data source
   engine.addProvider(new RpcSubprovider({rpcUrl}));
 
-  // log new blocks
-  engine.on('block', function (block) {
-    // console.log('================================');
-    // console.log('BLOCK CHANGED:', '#' + block.number.toString('hex'), '0x' + block.hash.toString('hex'));
-    // console.log('================================');
-  });
-
   // network connectivity error
   engine.on('error', function (err) {
     // report connectivity errors
-    console.error(err.stack)
+    console.error('provider error', err.stack)
   });
 
   // start polling for blocks
