@@ -70,26 +70,27 @@ module.exports = (options) => {
   engine.addProvider(new HookedWalletSubprovider({
     getAccounts: async function (cb) {
       let error;
-      await client.waitForReady().catch(e => {error = e; cb(e);});
+      await client.waitForReady().catch(e => {error = e;});
       if(error) {
-        return;
+        console.error(error);
+        return cb(null, []);
       }
       cb(null, client.getAccountsAddresses());
     },
     approveTransaction: async function (txParams, cb) {
       let error;
-      await client.waitForReady().catch(e => {error = e; cb(e);});
+      await client.waitForReady().catch(e => {error = e;});
       if(error) {
-        return;
+        return cb(error);
       }
       //TODO: show confirmation window
       cb(null, true);
     },
     signTransaction: async function (txParams, cb) {
       let error;
-      await client.waitForReady().catch(e => {error = e; cb(e);});
+      await client.waitForReady().catch(e => {error = e;});
       if(error) {
-        return;
+        return cb(error);
       }
       this.emitPayload({ method: 'net_version', params: [] }, function(err, res){
         if (err) return cb(err);
@@ -99,17 +100,17 @@ module.exports = (options) => {
     },
     signMessage: async function (msgParams, cb) {
       let error;
-      await client.waitForReady().catch(e => {error = e; cb(e);});
+      await client.waitForReady().catch(e => {error = e;});
       if(error) {
-        return;
+        return cb(error);
       }
       cb(null, client.signMessage(msgParams.data));
     },
     signTypedMessage: async function (msgParams, cb) {
       let error;
-      await client.waitForReady().catch(e => {error = e; cb(e);});
+      await client.waitForReady().catch(e => {error = e;});
       if(error) {
-        return;
+        return cb(error);
       }
       cb(null, client.signMessage(msgParams.data));
     }
