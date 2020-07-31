@@ -23,7 +23,7 @@ module.exports = (options) => {
     return response.data;
   };
 
-  let seedLoading;
+  let seedLoading = true;
   let email;
   let phone;
   let username;
