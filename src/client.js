@@ -62,7 +62,7 @@ module.exports = (options) => {
     },
 
     async waitForReady(times = 0) {
-      if(this.isWalletLoading()) {
+      if(!this.isWalletLoading()) {
         throw new Error("failed_loading");
       }
       if(this.isReady()) {
@@ -481,10 +481,10 @@ module.exports = (options) => {
       cryptoMetadata = JSON.parse(wallet.cryptoMetadataJson);
       return this.getSession().then(({ secret }) => {
         if(!secret) {
-          throw new Error('secret_is_null');
+          return false;
         }
         if(!_seed) {
-          throw new Error('seed_is_null');
+          return false;
         }
         localStorage.setItem('GeesomeWallet:encryptedSeed', lib.encrypt(secret, _seed));
         return true;
@@ -493,7 +493,7 @@ module.exports = (options) => {
 
     async getEncryptedSeedFromLocalStorage(...args) {
       this._getEncryptedSeedFromLocalStorage(...args).catch((e) => {
-        seedLoading = true;
+        seedLoading = false;
         throw e;
       })
     },
