@@ -69,16 +69,28 @@ module.exports = (options) => {
   // id mgmt
   engine.addProvider(new HookedWalletSubprovider({
     getAccounts: async function (cb) {
-      await client.waitForReady().catch(cb);
+      try {
+        await client.waitForReady()
+      } catch(e) {
+        return cb(e);
+      }
       cb(null, client.getAccountsAddresses());
     },
     approveTransaction: async function (txParams, cb) {
-      await client.waitForReady().catch(cb);
+      try {
+        await client.waitForReady()
+      } catch(e) {
+        return cb(e);
+      }
       //TODO: show confirmation window
       cb(null, true);
     },
     signTransaction: async function (txParams, cb) {
-      await client.waitForReady().catch(cb);
+      try {
+        await client.waitForReady()
+      } catch(e) {
+        return cb(e);
+      }
       this.emitPayload({ method: 'net_version', params: [] }, function(err, res){
         if (err) return cb(err);
         txParams.chainId = parseInt(res.result);
@@ -86,11 +98,19 @@ module.exports = (options) => {
       });
     },
     signMessage: async function (msgParams, cb) {
-      await client.waitForReady().catch(cb);
+      try {
+        await client.waitForReady()
+      } catch(e) {
+        return cb(e);
+      }
       cb(null, client.signMessage(msgParams.data));
     },
     signTypedMessage: async function (msgParams, cb) {
-      await client.waitForReady().catch(cb);
+      try {
+        await client.waitForReady()
+      } catch(e) {
+        return cb(e);
+      }
       cb(null, client.signMessage(msgParams.data));
     }
   }));
