@@ -264,7 +264,7 @@ module.exports = (options) => {
     },
 
     async loginByWorker(...args) {
-      return this._loginByWorker(args).catch((e) => {
+      return this._loginByWorker(...args).catch((e) => {
         seedLoading = false;
         throw e;
       });
