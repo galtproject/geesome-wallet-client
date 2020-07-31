@@ -151,6 +151,7 @@ module.exports = (options) => {
         args: [_email, _phone, _username, _password, _additionalData]
       });
 
+      await this.initSessionByWallet(wallet);
       this.setEncryptedSeedToLocalStorage(wallet || pendingWallet, _seed);
 
       return {wallet, pendingWallet, seed: _seed};
@@ -277,6 +278,7 @@ module.exports = (options) => {
         args: [_login, _password, _method]
       });
 
+      await this.initSessionByWallet(wallet);
       this.setEncryptedSeedToLocalStorage(wallet, _seed);
 
       return {wallet, seed: _seed};
@@ -288,6 +290,19 @@ module.exports = (options) => {
         return this.loginByWorker(_login, _password, _method);
       } else {
         return this.login(_login, _password, _method);
+      }
+    },
+
+    async initSessionByWallet(wallet) {
+      if(!wallet) {
+        return;
+      }
+      if(wallet.phone) {
+        return this.getWalletByPhoneAndPasswordHash(wallet.phone, wallet.phonePasswordHash);
+      } else if(wallet.email) {
+        return this.getWalletByUsernameAndPasswordHash(wallet.email, wallet.emailPasswordHash);
+      } else if(wallet.username) {
+        return this.getWalletByUsernameAndPasswordHash(wallet.username, wallet.usernamePasswordHash);
       }
     },
 
@@ -426,6 +441,7 @@ module.exports = (options) => {
         args: [_walletData]
       });
 
+      await this.initSessionByWallet(wallet);
       this.setEncryptedSeedToLocalStorage(wallet);
 
       return {wallet, pendingWallet};
