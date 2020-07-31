@@ -72,7 +72,6 @@ module.exports = (options) => {
       let error;
       await client.waitForReady().catch(e => {error = e;});
       if(error) {
-        console.error(error);
         return cb(null, []);
       }
       cb(null, client.getAccountsAddresses());

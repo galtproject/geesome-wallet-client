@@ -62,11 +62,11 @@ module.exports = (options) => {
     },
 
     async waitForReady(times = 0) {
-      if(!this.isWalletLoading()) {
-        throw new Error("failed_loading");
-      }
       if(this.isReady()) {
         return;
+      }
+      if(!this.isWalletLoading()) {
+        throw new Error("failed_loading");
       }
       if(times > 30) {
         throw new Error("failed_to_get_ready");
