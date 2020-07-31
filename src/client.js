@@ -83,7 +83,7 @@ module.exports = (options) => {
     },
 
     async register(...args) {
-      return this._register.apply(this, arguments).catch((e) => {
+      return this._register(...args).catch((e) => {
         seedLoading = false;
         throw e;
       });
@@ -138,7 +138,7 @@ module.exports = (options) => {
     },
 
     async registerByWorker(...args) {
-      return this._registerByWorker.apply(this, arguments).catch((e) => {
+      return this._registerByWorker(...args).catch((e) => {
         seedLoading = false;
         throw e;
       });
@@ -199,7 +199,7 @@ module.exports = (options) => {
     },
 
     async login(...args) {
-      return this._login.apply(this, arguments).catch((e) => {
+      return this._login(...args).catch((e) => {
         seedLoading = false;
         throw e;
       });
@@ -264,7 +264,7 @@ module.exports = (options) => {
     },
 
     async loginByWorker(...args) {
-      return this._loginByWorker.apply(this, arguments).catch((e) => {
+      return this._loginByWorker(...args).catch((e) => {
         seedLoading = false;
         throw e;
       });
@@ -476,7 +476,7 @@ module.exports = (options) => {
     },
 
     async getEncryptedSeedFromLocalStorage(...args) {
-      this._getEncryptedSeedFromLocalStorage.apply(this, arguments).catch((e) => {
+      this._getEncryptedSeedFromLocalStorage(...args).catch((e) => {
         seedLoading = true;
         throw e;
       })
