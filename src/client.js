@@ -10,7 +10,6 @@
 const axios = require('axios');
 const lib = require('./lib');
 const clone = require('lodash/clone');
-const ethers = require('ethers');
 
 module.exports = (options) => {
   let { backendUrl } = options;
@@ -24,6 +23,7 @@ module.exports = (options) => {
     return response.data;
   };
 
+  let seedLoading;
   let email;
   let phone;
   let username;
@@ -53,15 +53,22 @@ module.exports = (options) => {
       this.worker = _worker;
     },
 
+    isWalletLoading() {
+      return seedLoading;
+    },
+
     isReady() {
       return !!seed && !!cryptoMetadata;
     },
 
     async waitForReady(times = 0) {
+      if(this.isWalletLoading()) {
+        throw new Error("failed_loading");
+      }
       if(this.isReady()) {
         return;
       }
-      if(times > 10) {
+      if(times > 30) {
         throw new Error("failed_to_get_ready");
       }
       return new Promise((resolve) => {
@@ -75,7 +82,16 @@ module.exports = (options) => {
       })
     },
 
-    async register(_email, _phone, _username, _password, _additionalData = {}) {
+    async register(...args) {
+      return this._register(...args).catch((e) => {
+        seedLoading = false;
+        throw e;
+      });
+    },
+
+    async _register(_email, _phone, _username, _password, _additionalData = {}) {
+      seedLoading = true;
+
       email = _email;
       username = _username;
       phone = _phone;
@@ -84,6 +100,8 @@ module.exports = (options) => {
       const {seed: _seed} = _additionalData;
       seed = _seed || lib.generateMnemonic();
       const primaryWallet = lib.getKeypairByMnemonic(seed, 0, cryptoMetadata.derivationPath);
+
+      seedLoading = false;
 
       const walletData = {
         ..._additionalData,
@@ -119,7 +137,15 @@ module.exports = (options) => {
       return {wallet, pendingWallet, seed};
     },
 
-    async registerByWorker(_email, _phone, _username, _password, _additionalData = {}) {
+    async registerByWorker(...args) {
+      return this._registerByWorker(...args).catch((e) => {
+        seedLoading = false;
+        throw e;
+      });
+    },
+
+    async _registerByWorker(_email, _phone, _username, _password, _additionalData = {}) {
+      seedLoading = true;
       const {wallet, pendingWallet, seed: _seed} = await this.worker.callMethod('register', {
         options,
         args: [_email, _phone, _username, _password, _additionalData]
@@ -172,7 +198,14 @@ module.exports = (options) => {
       }).then(wrapResponse);
     },
 
-    async login(_login, _password, _method = 'email') {
+    async login(...args) {
+      return this._login(...args).catch((e) => {
+        seedLoading = false;
+        throw e;
+      });
+    },
+
+    async _login(_login, _password, _method = 'email') {
       let wallet;
 
       if(_method === 'email') {
@@ -230,7 +263,15 @@ module.exports = (options) => {
       return {seed, wallet};
     },
 
-    async loginByWorker(_login, _password, _method = 'email') {
+    async loginByWorker(...args) {
+      return this._loginByWorker(args).catch((e) => {
+        seedLoading = false;
+        throw e;
+      });
+    },
+
+    async _loginByWorker(_login, _password, _method = 'email') {
+      seedLoading = true;
       const {wallet, seed: _seed} = await this.worker.callMethod('login', {
         options,
         args: [_login, _password, _method]
@@ -242,6 +283,7 @@ module.exports = (options) => {
     },
 
     async preferLogin(_login, _password, _method = 'email') {
+      seedLoading = true;
       if(this.worker) {
         return this.loginByWorker(_login, _password, _method);
       } else {
@@ -433,7 +475,15 @@ module.exports = (options) => {
       });
     },
 
-    async getEncryptedSeedFromLocalStorage() {
+    async getEncryptedSeedFromLocalStorage(...args) {
+      this._getEncryptedSeedFromLocalStorage(...args).catch((e) => {
+        seedLoading = true;
+        throw e;
+      })
+    },
+
+    async _getEncryptedSeedFromLocalStorage() {
+      seedLoading = true;
       if(!global.localStorage) {
         return false;
       }
@@ -454,6 +504,9 @@ module.exports = (options) => {
       seed = lib.decrypt(secret, encryptedSeed);
 
       await this.fetchCryptoMetadata();
+
+      seedLoading = false;
+
       return true;
     },
 
