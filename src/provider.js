@@ -77,6 +77,7 @@ module.exports = (options) => {
       try {
         cb(null, client.getAccountsAddresses());
       } catch (e) {
+        console.warn('getAccountsAddresses error', e);
         cb(null, []);
       }
     },
