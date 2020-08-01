@@ -74,7 +74,11 @@ module.exports = (options) => {
       if(error) {
         return cb(null, []);
       }
-      cb(null, client.getAccountsAddresses());
+      try {
+        cb(null, client.getAccountsAddresses());
+      } catch (e) {
+        cb(null, []);
+      }
     },
     approveTransaction: async function (txParams, cb) {
       let error;
